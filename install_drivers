@@ -1,0 +1,38 @@
+@echo off
+setlocal enabledelayedexpansion
+:: Скрипт для автоматической установки драйверов из .inf-файлов в текущей директории и её поддиректориях
+:: Запуск с правами администратора
+
+:: Проверка прав администратора
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    exit /b 1
+)
+
+:: Настройка базовой директории и путей
+set "BASE_DIR=%~dp0"
+set "DRIVERS_LIST=%BASE_DIR%drivers.tmp"
+
+:: Очистка временного файла со списком драйверов
+del "%DRIVERS_LIST%" 2>nul
+
+:: Поиск .inf-файлов и создание списка
+for /r "%BASE_DIR%" %%d in (*.inf) do (
+    echo Найден: %%~nxd
+    echo %%d >> "%DRIVERS_LIST%"
+)
+
+:: Выход, если драйверы не найдены
+if not exist "%DRIVERS_LIST%" (
+    exit /b 1
+)
+
+:: Установка драйверов через setupapi.dll
+for /f "tokens=*" %%f in ('type "%DRIVERS_LIST%"') do (
+    pushd "%%~dpf"
+    rundll32.exe setupapi.dll,InstallHinfSection DefaultInstall 132 "%%~nxf"
+    popd
+)
+
+endlocal
+TIMEOUT /T 5 /NOBREAK
