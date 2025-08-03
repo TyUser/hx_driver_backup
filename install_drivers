@@ -30,7 +30,7 @@ if not exist "%DRIVERS_LIST%" (
 :: Установка драйверов через setupapi.dll
 for /f "tokens=*" %%f in ('type "%DRIVERS_LIST%"') do (
     pushd "%%~dpf"
-    rundll32.exe setupapi.dll,InstallHinfSection DefaultInstall 132 "%%~nxf"
+    pnputil /add-driver "%%~nxf" /install
     popd
 )
 
