@@ -27,7 +27,7 @@ if not exist "%DRIVERS_LIST%" (
     exit /b 1
 )
 
-:: Установка драйверов через setupapi.dll
+:: Установка драйверов через pnputil
 for /f "tokens=*" %%f in ('type "%DRIVERS_LIST%"') do (
     pushd "%%~dpf"
     pnputil /add-driver "%%~nxf" /install
